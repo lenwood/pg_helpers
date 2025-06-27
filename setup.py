@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="pg-helpers",
-    version="1.0.0",
+    version="1.1.0",
     author="Chris Leonard",
     description="PostgreSQL helper functions for data analysis",
     packages=find_packages(),
