@@ -10,12 +10,12 @@ from sqlalchemy import create_engine, text
 from sqlalchemy.exc import SQLAlchemyError
 import warnings
 
-from .config import validate_db_config
+from .config import validate_db_config, get_ssl_params
 from .notifications import play_notification_sound
 
 def createPostgresqlEngine():
     """
-    Create SQLAlchemy engine for PostgreSQL connection
+    Create SQLAlchemy engine for PostgreSQL connection with SSL support
     
     Returns:
         sqlalchemy.Engine: Database engine
@@ -26,15 +26,166 @@ def createPostgresqlEngine():
     """
     try:
         config = validate_db_config()
-        engine = create_engine(
+        ssl_params = get_ssl_params()
+        
+        # Build connection string with SSL parameters
+        connection_string = (
             f"postgresql://{config['user']}:{config['password']}@"
-            f"{config['host']}:{config['port']}/{config['database']}?sslmode=require"
+            f"{config['host']}:{config['port']}/{config['database']}?{ssl_params}"
         )
+        
+        # Optional: Log connection details (without password)
+        safe_connection_string = connection_string.replace(config['password'], '****')
+        print(f"Connecting to PostgreSQL with SSL: {safe_connection_string}")
+        
+        engine = create_engine(connection_string)
         return engine
+        
     except Exception as e:
         print(f"Error creating PostgreSQL engine: {e}")
         raise
 
+def createPostgresqlEngineWithCustomSSL(ssl_ca_cert=None, ssl_mode='require', ssl_cert=None, ssl_key=None):
+    """
+    Create SQLAlchemy engine with custom SSL configuration (programmatic override)
+    
+    Args:
+        ssl_ca_cert (str, optional): Path to CA certificate file
+        ssl_mode (str): SSL mode (disable, allow, prefer, require, verify-ca, verify-full)
+        ssl_cert (str, optional): Path to client certificate file
+        ssl_key (str, optional): Path to client key file
+    
+    Returns:
+        sqlalchemy.Engine: Database engine
+    """
+    try:
+        config = validate_db_config()
+        ssl_params = [f"sslmode={ssl_mode}"]
+        
+        if ssl_ca_cert:
+            if not os.path.exists(ssl_ca_cert):
+                raise ValueError(f"SSL CA certificate file not found: {ssl_ca_cert}")
+            ssl_params.append(f"sslrootcert={ssl_ca_cert}")
+        
+        if ssl_cert:
+            if not os.path.exists(ssl_cert):
+                raise ValueError(f"SSL client certificate file not found: {ssl_cert}")
+            ssl_params.append(f"sslcert={ssl_cert}")
+        
+        if ssl_key:
+            if not os.path.exists(ssl_key):
+                raise ValueError(f"SSL client key file not found: {ssl_key}")
+            ssl_params.append(f"sslkey={ssl_key}")
+        
+        ssl_param_string = '&'.join(ssl_params)
+        
+        connection_string = (
+            f"postgresql://{config['user']}:{config['password']}@"
+            f"{config['host']}:{config['port']}/{config['database']}?{ssl_param_string}"
+        )
+        
+        # Log connection details (without password)
+        safe_connection_string = connection_string.replace(config['password'], '****')
+        print(f"Connecting to PostgreSQL with custom SSL: {safe_connection_string}")
+        
+        engine = create_engine(connection_string)
+        return engine
+        
+    except Exception as e:
+        print(f"Error creating PostgreSQL engine with custom SSL: {e}")
+        raise
+
+def test_ssl_connection(engine=None):
+    """
+    Test SSL connection and display SSL information
+    
+    Args:
+        engine: SQLAlchemy engine (optional, will create one if not provided)
+    
+    Returns:
+        dict: SSL connection information
+    """
+    if engine is None:
+        engine = createPostgresqlEngine()
+    
+    try:
+        with engine.connect() as conn:
+            # Query PostgreSQL for SSL information
+            ssl_info = {}
+            
+            # Basic connection information
+            try:
+                basic_info_query = """
+                SELECT
+                    coalesce(s.ssl, false) AS ssl_active,
+                    version() AS pg_version,
+                    (SELECT setting FROM pg_settings WHERE name = 'ssl') AS ssl_enabled_on_server,
+                    inet_client_addr() as client_address,
+                    inet_server_addr() AS server_address
+                FROM
+                    pg_stat_ssl s
+                JOIN
+                    pg_stat_activity a ON s.pid = a.pid
+                WHERE
+                    a.pid = pg_backend_pid();
+                """
+                result = conn.execute(text(basic_info_query))
+                row = result.fetchone()
+                
+                # Handle different SQLAlchemy result formats
+                if hasattr(row, '_asdict'):
+                    # Named tuple style
+                    ssl_info.update(row._asdict())
+                elif hasattr(row, 'keys'):
+                    # Mapping style
+                    ssl_info.update(dict(row))
+                else:
+                    # Manual mapping using column names
+                    columns = list(result.keys())
+                    ssl_info.update({col: val for col, val in zip(columns, row)})
+                    
+            except Exception as e:
+                ssl_info['basic_info_error'] = str(e)
+            
+            # SSL-specific details (these functions may not exist in all PostgreSQL versions)
+            ssl_functions = [
+                ('ssl_cipher', 'ssl_cipher()'),
+                ('ssl_version', 'ssl_version()'),
+                ('ssl_client_cert_present', 'ssl_client_cert_present()'),
+                ('ssl_client_serial', 'ssl_client_serial()'),
+                ('ssl_client_dn', 'ssl_client_dn()'),
+                ('ssl_issuer_dn', 'ssl_issuer_dn()')
+            ]
+            
+            for field_name, function_call in ssl_functions:
+                try:
+                    result = conn.execute(text(f"SELECT {function_call} as {field_name}"))
+                    value = result.fetchone()[0]
+                    ssl_info[field_name] = value
+                    if field_name == 'ssl_cipher' and value:
+                        ssl_info['ssl_active'] = True
+                except Exception:
+                    # Function doesn't exist or SSL not active
+                    ssl_info[field_name] = None
+            
+            # Determine if SSL is active based on available information
+            if 'ssl_active' not in ssl_info:
+                # If we couldn't get ssl_cipher, try to infer SSL status
+                ssl_info['ssl_active'] = ssl_info.get('ssl_cipher') is not None
+            
+            print("SSL Connection Test Results:")
+            print("-" * 40)
+            for key, value in ssl_info.items():
+                print(f"{key}: {value}")
+            print("-" * 40)
+            
+            return ssl_info
+            
+    except Exception as e:
+        print(f"SSL connection test failed: {e}")
+        raise
+
+# Rest of your existing functions remain the same...
 def dataGrabber(query, engine, limit='None', debug=False):
     """
     Execute query using SQLAlchemy engine and return pandas DataFrame with robust error handling.
