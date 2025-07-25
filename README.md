@@ -11,7 +11,7 @@ A Python package providing robust utilities for PostgreSQL database operations, 
 - ⚙️ **Environment-based configuration** for secure credential management
 - 🛡️ **Comprehensive error handling** and logging
 - 🔒 **SSL/TLS encryption** with CA certificate verification for AWS RDS and other cloud databases
-- **Enhanced in v1.3.0:**
+- **Enhanced in v1.3.1:**
   - 🧪 **Comprehensive test suite** with 34+ test cases covering all functionality
   - ✅ **Cross-platform validation** ensuring reliability on Windows, macOS, and Linux
   - 🔍 **Function name improvements** for better API clarity
@@ -23,7 +23,7 @@ A Python package providing robust utilities for PostgreSQL database operations, 
   - 🚀 **Advanced fallback methods** for SQLAlchemy/pandas compatibility issues
   - 🔍 **Enhanced debugging** and diagnostic capabilities
 
-## What's New in Version 1.3.0 🧪
+## What's New in Version 1.3.1 🧪
 
 ### Testing and Reliability Improvements
 - **Comprehensive test suite**: 34+ test cases covering all functions and edge cases
@@ -56,7 +56,7 @@ pip install -e .
 
 ### From GitHub (Specific Version)
 ```bash
-pip install git+https://github.com/yourusername/pg_helpers.git@v1.3.0
+pip install git+https://github.com/yourusername/pg_helpers.git@v1.3.1
 ```
 
 ### Dependencies
@@ -561,7 +561,7 @@ your_project/
 
 ## Changelog
 
-### Version 1.3.0 (Current) 🧪
+### Version 1.3.1 (Current) 🧪
 - 🧪 **Comprehensive test suite**: 34+ test cases with >90% code coverage
 - ✅ **Cross-platform validation**: Tests confirm functionality on Windows, macOS, and Linux
 - 🔧 **API improvements**: `test_ssl_connection()` renamed to `check_ssl_connection()` for clarity
@@ -617,4 +617,4 @@ Chris Leonard
 
 ---
 
-*This package was designed for data analysts and engineers who work with PostgreSQL databases and need reliable, automated query execution with enterprise-grade security. Version 1.3.0 ensures this reliability through comprehensive testing across multiple platforms and Python versions.*
+*This package was designed for data analysts and engineers who work with PostgreSQL databases and need reliable, automated query execution with enterprise-grade security. Version 1.3.1 ensures this reliability through comprehensive testing across multiple platforms and Python versions.*

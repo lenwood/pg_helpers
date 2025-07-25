@@ -6,13 +6,13 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setup(
     name="pg-helpers",
-    version="1.3.0",
+    version="1.3.1",
     author="Chris Leonard",
-    author_email="cleontx@duck.com",  # Add your email
+    author_email="lenwood@duck.com",
     description="PostgreSQL helper functions for data analysis with enterprise-grade security",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/lenwood/pg_helpers",  # Update with your GitHub URL
+    url="https://github.com/lenwood/pg_helpers",
     project_urls={
         "Bug Reports": "https://github.com/lenwood/pg_helpers/issues",
         "Source": "https://github.com/lenwood/pg_helpers",
