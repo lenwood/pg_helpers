@@ -95,9 +95,9 @@ def createPostgresqlEngineWithCustomSSL(ssl_ca_cert=None, ssl_mode='require', ss
         print(f"Error creating PostgreSQL engine with custom SSL: {e}")
         raise
 
-def test_ssl_connection(engine=None):
+def check_ssl_connection(engine=None):
     """
-    Test SSL connection and display SSL information
+    Verify SSL connection and display SSL information
     
     Args:
         engine: SQLAlchemy engine (optional, will create one if not provided)
