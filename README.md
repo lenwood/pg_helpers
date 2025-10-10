@@ -11,6 +11,8 @@ A Python package providing robust utilities for PostgreSQL database operations, 
 - ⚙️ **Environment-based configuration** for secure credential management
 - 🛡️ **Comprehensive error handling** and logging
 - 🔒 **SSL/TLS encryption** with CA certificate verification for AWS RDS and other cloud databases
+- **Updated in v1.3.3**
+  - ✅ **Recommended install via PyPi**: Use 'pip install pg_helpers' to install
 - **Enhanced in v1.3.2**
   - 📁 **Flexible credential file location**: Support for `CREDENTIALS_DIR` and `CREDENTIALS_FILE` environment variables
   - 🔄 **Enhanced configuration**: Specify custom .env file paths for different projects and environments
@@ -70,7 +72,7 @@ pip install -e .
 
 ### From GitHub (Specific Version)
 ```bash
-pip install git+https://github.com/lenwood/pg_helpers.git@v1.3.2
+pip install git+https://github.com/lenwood/pg_helpers.git@v1.3.3
 ```
 
 ### Dependencies
@@ -757,7 +759,10 @@ your_project/
 
 ## Changelog
 
-### Version 1.3.2 (Current) 📁
+### Version 1.3.3 (Current) 📁
+- ✅ **Updated installation instructions**: Recommend using 'pip install pg_helpers'
+
+### Version 1.3.2
 - 📁 **Flexible credential file location**: Support for `CREDENTIALS_DIR` and `CREDENTIALS_FILE` environment variables
 - 🔄 **Enhanced configuration**: Specify custom .env file paths for different projects and environments
 - 🏢 **Centralized credentials**: Share credential directories across multiple projects
