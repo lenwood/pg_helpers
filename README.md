@@ -149,7 +149,6 @@ engine = createPostgresqlEngine()
 - 🌍 **Environment-specific**: Use `.env.production`, `.env.staging`, `.env.dev`
 - 🔄 **Multi-project**: Reuse credentials across multiple analysis projects
 - ✅ **Backwards compatible**: Existing code works without changes
-```
 
 ### 2. Basic Usage
 
