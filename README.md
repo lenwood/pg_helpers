@@ -11,8 +11,12 @@ A Python package providing robust utilities for PostgreSQL database operations, 
 - ⚙️ **Environment-based configuration** for secure credential management
 - 🛡️ **Comprehensive error handling** and logging
 - 🔒 **SSL/TLS encryption** with CA certificate verification for AWS RDS and other cloud databases
+- **Enhanced in v1.3.2**
+  - 📁 **Flexible credential file location**: Support for `CREDENTIALS_DIR` and `CREDENTIALS_FILE` environment variables
+  - 🔄 **Enhanced configuration**: Specify custom .env file paths for different projects and environments
+  - 🏢 **Centralized credentials**: Share credential directories across multiple projects
 - **Enhanced in v1.3.1:**
-  - 🧪 **Comprehensive test suite** with 34+ test cases covering all functionality
+  - 🧪 **Comprehensive test suite** with 40+ test cases covering all functionality
   - ✅ **Cross-platform validation** ensuring reliability on Windows, macOS, and Linux
   - 🔍 **Function name improvements** for better API clarity
 - **Previous in v1.2.0:**
@@ -23,26 +27,31 @@ A Python package providing robust utilities for PostgreSQL database operations, 
   - 🚀 **Advanced fallback methods** for SQLAlchemy/pandas compatibility issues
   - 🔍 **Enhanced debugging** and diagnostic capabilities
 
-## What's New in Version 1.3.1 🧪
+## What's New in Version 1.3.2 🧪
 
-### Testing and Reliability Improvements
-- **Comprehensive test suite**: 34+ test cases covering all functions and edge cases
-- **Cross-platform compatibility**: Tests validate functionality on Windows, macOS, and Linux
-- **API improvements**: `test_ssl_connection()` renamed to `check_ssl_connection()` for clarity
-- **Test coverage**: >90% code coverage ensuring reliability
-- **CI/CD ready**: GitHub Actions workflow for automated testing
-
-### Quality Assurance Features
+### Flexible Credential File Configuration
+- **Custom credential locations**: Use `CREDENTIALS_DIR` and `CREDENTIALS_FILE` environment variables
+- **Perfect for shared credentials**: Point multiple projects to a centralized credential directory
+- **Environment-specific files**: Use different credential files for dev/staging/production
+- **Fully backwards compatible**: Existing projects continue to work without any changes
 ```python
-# Run the full test suite to validate your environment
-python -m pytest tests/ -v
+import os
 
-# Check test coverage
-python -m pytest tests/ --cov=pg_helpers --cov-report=html
+# Use centralized credentials directory
+os.environ['CREDENTIALS_DIR'] = r'C:\Documents\Credentials'
+from pg_helpers import createPostgresqlEngine
+engine = createPostgresqlEngine()  # Loads C:\Documents\Credentials\.env
 
-# All functions are thoroughly tested including error conditions
-from pg_helpers import check_ssl_connection, dataGrabber
-ssl_info = check_ssl_connection()  # Now with improved naming
+# Use custom filename for database credentials
+os.environ['CREDENTIALS_FILE'] = '.env.database'
+from pg_helpers import createPostgresqlEngine
+engine = createPostgresqlEngine()  # Loads ./.env.database
+
+# Combine both for full flexibility
+os.environ['CREDENTIALS_DIR'] = r'C:\Documents\Project\Assets'
+os.environ['CREDENTIALS_FILE'] = '.env.production'
+from pg_helpers import createPostgresqlEngine
+engine = createPostgresqlEngine()  # Loads C:\Documents\Project\Assets\.env.production
 ```
 
 ## Installation
@@ -56,7 +65,7 @@ pip install -e .
 
 ### From GitHub (Specific Version)
 ```bash
-pip install git+https://github.com/yourusername/pg_helpers.git@v1.3.1
+pip install git+https://github.com/yourusername/pg_helpers.git@v1.3.2
 ```
 
 ### Dependencies
@@ -88,6 +97,58 @@ DB_SSL_MODE=require
 # For AWS RDS with maximum security:
 # DB_SSL_MODE=verify-full
 # DB_SSL_CA_CERT=./certs/rds-ca-2019-root.pem
+```
+
+#### Flexible Credential Location Setup **NEW in v1.3.2**
+
+You can now specify custom locations for your credential files using environment variables:
+
+**Option 1: Centralized credential directory**
+```python
+import os
+# Point to a shared credentials folder
+os.environ['CREDENTIALS_DIR'] = r'C:\Users\Me\Documents\Credentials'
+# Will load: C:\Users\Me\Documents\Credentials\.env
+
+from pg_helpers import createPostgresqlEngine
+engine = createPostgresqlEngine()
+```
+
+**Option 2: Custom credential filename**
+```python
+import os
+# Use a specific credential file name in current directory
+os.environ['CREDENTIALS_FILE'] = '.env.database'
+# Will load: ./.env.database
+
+from pg_helpers import createPostgresqlEngine
+engine = createPostgresqlEngine()
+```
+
+**Option 3: Both custom directory and filename**
+```python
+import os
+# Full custom path
+os.environ['CREDENTIALS_DIR'] = r'C:\Documents\Project\Assets'
+os.environ['CREDENTIALS_FILE'] = '.env.production'
+# Will load: C:\Documents\Project\Assets\.env.production
+
+from pg_helpers import createPostgresqlEngine
+engine = createPostgresqlEngine()
+```
+
+**Configuration Priority:**
+- Both `CREDENTIALS_DIR` and `CREDENTIALS_FILE` set → `{CREDENTIALS_DIR}/{CREDENTIALS_FILE}`
+- Only `CREDENTIALS_DIR` set → `{CREDENTIALS_DIR}/.env`
+- Only `CREDENTIALS_FILE` set → `./{CREDENTIALS_FILE}`
+- Neither set (default) → `./.env`
+
+**Benefits of flexible credentials:**
+- 🔐 **Centralized security**: Keep all credentials in one secure location
+- 🏢 **Team workflows**: Share credential directories across team members
+- 🌍 **Environment-specific**: Use `.env.production`, `.env.staging`, `.env.dev`
+- 🔄 **Multi-project**: Reuse credentials across multiple analysis projects
+- ✅ **Backwards compatible**: Existing code works without changes
 ```
 
 ### 2. Basic Usage
@@ -258,7 +319,7 @@ Converts Python lists to SQL-compatible comma-separated strings.
 
 ### Running Tests
 
-The package includes a comprehensive test suite with 34+ test cases covering all functionality:
+The package includes a comprehensive test suite with 40+ test cases covering all functionality:
 
 ```bash
 # Install test dependencies
@@ -308,24 +369,46 @@ python -m pytest tests/test_database.py::TestNotifications -v  # Cross-platform 
 ### Test Output Example
 
 ```bash
-$ python -m pytest tests/ -v
 ================================================= test session starts =================================================
 platform win32 -- Python 3.12.9, pytest-8.4.1, pluggy-1.5.0
-collected 34 tests
+collected 40 items
 
-tests/test_database.py::TestQueryUtils::test_listPrep_integers PASSED                     [  2%]
-tests/test_database.py::TestQueryUtils::test_listPrep_floats PASSED                       [  5%]
-tests/test_database.py::TestQueryUtils::test_queryCleaner_basic PASSED                    [  8%]
-tests/test_database.py::TestConfig::test_get_db_config_complete PASSED                    [ 11%]
-tests/test_database.py::TestConfig::test_validate_db_config_missing_password PASSED      [ 14%]
-tests/test_database.py::TestDatabase::test_createPostgresqlEngine_success PASSED         [ 17%]
-tests/test_database.py::TestDatabase::test_dataGrabber_success PASSED                     [ 20%]
-tests/test_database.py::TestDatabase::test_check_ssl_connection_no_engine PASSED         [ 23%]
-tests/test_database.py::TestDatabase::test_recursiveDataGrabber_success_first_attempt PASSED [ 26%]
-... (25 more tests) ...
-tests/test_database.py::TestNotifications::test_play_notification_sound_windows PASSED   [100%]
+tests/test_database.py::TestQueryUtils::test_listPrep_empty_list PASSED                                          [  2%]
+tests/test_database.py::TestQueryUtils::test_listPrep_floats PASSED                                              [  5%]
+tests/test_database.py::TestQueryUtils::test_listPrep_integers PASSED                                            [  7%]
+tests/test_database.py::TestQueryUtils::test_listPrep_single_value PASSED                                        [ 10%]
+tests/test_database.py::TestQueryUtils::test_listPrep_strings PASSED                                             [ 12%]
+... (34 more tests) ...
+tests/test_database.py::TestNotifications::test_play_notification_sound_windows PASSED                           [100%]
 
-================================================= 34 passed in 1.23s =================================================
+================================================= 40 passed in 1.03s ==================================================
+```
+
+### Flexible Credential File Configuration **NEW in v1.3.2**
+
+- **Custom credential locations**: Use `CREDENTIALS_DIR` and `CREDENTIALS_FILE` environment variables
+- **Perfect for shared credentials**: Point multiple projects to a centralized credential directory
+- **Environment-specific files**: Use different credential files for dev/staging/production
+- **Fully backwards compatible**: Existing projects continue to work without any changes
+
+```python
+import os
+
+# Use centralized credentials directory
+os.environ['CREDENTIALS_DIR'] = r'C:\Documents\Credentials'
+from pg_helpers import createPostgresqlEngine
+engine = createPostgresqlEngine()  # Loads C:\Documents\Credentials\.env
+
+# Use custom filename for database credentials
+os.environ['CREDENTIALS_FILE'] = '.env.database'
+from pg_helpers import createPostgresqlEngine
+engine = createPostgresqlEngine()  # Loads ./.env.database
+
+# Combine both for full flexibility
+os.environ['CREDENTIALS_DIR'] = r'C:\Documents\Project\Assets'
+os.environ['CREDENTIALS_FILE'] = '.env.production'
+from pg_helpers import createPostgresqlEngine
+engine = createPostgresqlEngine()  # Loads C:\Documents\Project\Assets\.env.production
 ```
 
 ### Continuous Integration Setup **NEW in v1.3.0**
@@ -466,6 +549,115 @@ user_df = final_results['user_stats']
 sales_df = final_results['sales_data']
 ```
 
+## Credential Management Strategies **NEW in v1.3.2**
+
+### Strategy 1: Centralized Credentials for Multiple Projects
+
+Keep one credential directory for all your projects:
+
+```
+C:\Users\Me\Documents\Credentials\
+├── .env                    # General/shared credentials
+├── .env.database          # Database-specific credentials  
+├── .env.api               # API credentials
+└── .env.production        # Production environment
+
+Project1\
+├── analysis.py
+└── (no .env file needed)
+
+Project2\
+├── dashboard.py
+└── (no .env file needed)
+```
+
+**Setup in each project:**
+```python
+import os
+os.environ['CREDENTIALS_DIR'] = r'C:\Users\Me\Documents\Credentials'
+os.environ['CREDENTIALS_FILE'] = '.env.database'
+
+from pg_helpers import createPostgresqlEngine
+engine = createPostgresqlEngine()
+```
+
+### Strategy 2: Environment-Specific Credentials
+
+Use different credential files for different environments:
+
+```python
+import os
+
+# Detect environment (from ENV variable, config file, etc.)
+environment = os.getenv('APP_ENV', 'development')
+
+# Set credential file based on environment
+os.environ['CREDENTIALS_DIR'] = r'C:\Documents\Credentials'
+os.environ['CREDENTIALS_FILE'] = f'.env.{environment}'
+
+from pg_helpers import createPostgresqlEngine
+engine = createPostgresqlEngine()
+# Loads .env.development, .env.staging, or .env.production
+```
+
+### Strategy 3: Project-Specific Overrides
+
+Use centralized credentials with project-specific overrides:
+
+```python
+import os
+from pathlib import Path
+
+# Try project-local first, fall back to centralized
+if Path('.env.local').exists():
+    os.environ['CREDENTIALS_FILE'] = '.env.local'
+else:
+    os.environ['CREDENTIALS_DIR'] = r'C:\Documents\Credentials'
+    os.environ['CREDENTIALS_FILE'] = '.env.database'
+
+from pg_helpers import createPostgresqlEngine
+engine = createPostgresqlEngine()
+```
+
+### Best Practices for Credential Files
+
+**Security:**
+- ✅ Store credential directories outside of project repositories
+- ✅ Use restrictive file permissions (e.g., `chmod 600` on Linux/macOS)
+- ✅ Never commit credential file paths to version control
+- ✅ Document credential file locations in team wikis, not in code
+
+**Organization:**
+- 📁 Use descriptive filenames: `.env.database`, `.env.api`, `.env.aws`
+- 📁 Group by environment: `.env.production`, `.env.staging`
+- 📁 Keep a `.env.template` in your repository with dummy values
+
+**Team Workflows:**
+```python
+# config.py (committed to repository)
+import os
+from pathlib import Path
+
+def setup_credentials():
+    """Load credentials from standard team location or local override"""
+    # Check for local override first (for development)
+    if Path('.env.local').exists():
+        os.environ['CREDENTIALS_FILE'] = '.env.local'
+        return
+    
+    # Use team shared credentials location
+    team_creds = Path.home() / 'TeamShared' / 'Credentials'
+    if team_creds.exists():
+        os.environ['CREDENTIALS_DIR'] = str(team_creds)
+        os.environ['CREDENTIALS_FILE'] = '.env.database'
+        return
+    
+    # Fallback to default behavior
+    print("⚠️ No credentials found - using .env in current directory")
+
+# Call this before importing pg_helpers
+setup_credentials()
+
 ## Security Best Practices
 
 ### SSL/TLS Configuration
@@ -561,8 +753,16 @@ your_project/
 
 ## Changelog
 
-### Version 1.3.1 (Current) 🧪
-- 🧪 **Comprehensive test suite**: 34+ test cases with >90% code coverage
+### Version 1.3.2 (Current) 📁
+- 📁 **Flexible credential file location**: Support for `CREDENTIALS_DIR` and `CREDENTIALS_FILE` environment variables
+- 🔄 **Enhanced configuration**: Specify custom .env file paths for different projects and environments
+- 🏢 **Centralized credentials**: Share credential directories across multiple projects
+- 🌍 **Environment-specific files**: Easy support for .env.production, .env.staging, .env.dev
+- ✅ **Backwards compatible**: Defaults to `.env` in current directory when no variables set
+- 📖 **Documentation**: New credential management strategies and best practices guide
+
+### Version 1.3.1
+- 🧪 **Comprehensive test suite**: 40+ test cases with >90% code coverage
 - ✅ **Cross-platform validation**: Tests confirm functionality on Windows, macOS, and Linux
 - 🔧 **API improvements**: `test_ssl_connection()` renamed to `check_ssl_connection()` for clarity
 - 🚀 **CI/CD ready**: GitHub Actions workflow for automated testing across environments
@@ -617,4 +817,4 @@ Chris Leonard
 
 ---
 
-*This package was designed for data analysts and engineers who work with PostgreSQL databases and need reliable, automated query execution with enterprise-grade security. Version 1.3.1 ensures this reliability through comprehensive testing across multiple platforms and Python versions.*
+*This package was designed for data analysts and engineers who work with PostgreSQL databases and need reliable, automated query execution with enterprise-grade security. Version 1.3.2 adds flexible credential management while ensuring this reliability through comprehensive testing across multiple platforms and Python versions.*
