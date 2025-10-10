@@ -56,16 +56,21 @@ engine = createPostgresqlEngine()  # Loads C:\Documents\Project\Assets\.env.prod
 
 ## Installation
 
+### From PyPi (Recommended)
+```bash
+pip install pg_helpers
+```
+
 ### From Source (Development)
 ```bash
-git clone https://github.com/yourusername/pg_helpers.git
+git clone https://github.com/lenwood/pg_helpers.git
 cd pg_helpers
 pip install -e .
 ```
 
 ### From GitHub (Specific Version)
 ```bash
-pip install git+https://github.com/yourusername/pg_helpers.git@v1.3.2
+pip install git+https://github.com/lenwood/pg_helpers.git@v1.3.2
 ```
 
 ### Dependencies
@@ -799,7 +804,7 @@ your_project/
 
 ### Development Setup
 ```bash
-git clone https://github.com/yourusername/pg_helpers.git
+git clone https://github.com/lenwood/pg_helpers.git
 cd pg_helpers
 pip install -e .
 pip install pytest pytest-cov
