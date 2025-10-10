@@ -200,6 +200,132 @@ class TestConfig(unittest.TestCase):
             self.assertIn('sslcert=/path/to/client.crt', result)
             self.assertIn('sslkey=/path/to/client.key', result)
 
+    def test_load_env_with_fallback_default(self):
+        """Test load_env_with_fallback with default behavior (no env vars set)"""
+        # Create a temporary .env file in current directory
+        with tempfile.NamedTemporaryFile(mode='w', delete=False, suffix='.env', dir='.') as f:
+            f.write("DB_USER=default_user\n")
+            f.write("DB_PASSWORD=default_pass\n")
+            env_file = f.name
+        
+        try:
+            # Rename to .env
+            os.rename(env_file, '.env')
+            
+            # Clear any existing env vars that might interfere
+            with patch.dict(os.environ, {}, clear=True):
+                # Reload the module to trigger load_env_with_fallback
+                import importlib
+                import pg_helpers.config
+                importlib.reload(pg_helpers.config)
+                
+                # Check that default .env was loaded
+                self.assertEqual(os.getenv('DB_USER'), 'default_user')
+                self.assertEqual(os.getenv('DB_PASSWORD'), 'default_pass')
+        
+        finally:
+            if os.path.exists('.env'):
+                os.unlink('.env')
+    
+    def test_load_env_with_fallback_credentials_dir_only(self):
+        """Test load_env_with_fallback with only CREDENTIALS_DIR set"""
+        # Create temporary credentials directory
+        with tempfile.TemporaryDirectory() as tmpdir:
+            env_file = os.path.join(tmpdir, '.env')
+            with open(env_file, 'w') as f:
+                f.write("DB_USER=dir_user\n")
+                f.write("DB_PASSWORD=dir_pass\n")
+            
+            # Set only CREDENTIALS_DIR
+            with patch.dict(os.environ, {'CREDENTIALS_DIR': tmpdir}, clear=True):
+                import importlib
+                import pg_helpers.config
+                importlib.reload(pg_helpers.config)
+                
+                self.assertEqual(os.getenv('DB_USER'), 'dir_user')
+                self.assertEqual(os.getenv('DB_PASSWORD'), 'dir_pass')
+    
+    def test_load_env_with_fallback_credentials_file_only(self):
+        """Test load_env_with_fallback with only CREDENTIALS_FILE set"""
+        # Create a custom named file in current directory
+        with tempfile.NamedTemporaryFile(mode='w', delete=False, suffix='.database', dir='.') as f:
+            f.write("DB_USER=file_user\n")
+            f.write("DB_PASSWORD=file_pass\n")
+            custom_filename = os.path.basename(f.name)
+        
+        try:
+            # Set only CREDENTIALS_FILE
+            with patch.dict(os.environ, {'CREDENTIALS_FILE': custom_filename}, clear=True):
+                import importlib
+                import pg_helpers.config
+                importlib.reload(pg_helpers.config)
+                
+                self.assertEqual(os.getenv('DB_USER'), 'file_user')
+                self.assertEqual(os.getenv('DB_PASSWORD'), 'file_pass')
+        
+        finally:
+            if os.path.exists(custom_filename):
+                os.unlink(custom_filename)
+    
+    def test_load_env_with_fallback_both_set(self):
+        """Test load_env_with_fallback with both CREDENTIALS_DIR and CREDENTIALS_FILE set"""
+        # Create temporary credentials directory with custom named file
+        with tempfile.TemporaryDirectory() as tmpdir:
+            env_file = os.path.join(tmpdir, '.env.custom')
+            with open(env_file, 'w') as f:
+                f.write("DB_USER=both_user\n")
+                f.write("DB_PASSWORD=both_pass\n")
+            
+            # Set both environment variables
+            with patch.dict(os.environ, {
+                'CREDENTIALS_DIR': tmpdir,
+                'CREDENTIALS_FILE': '.env.custom'
+            }, clear=True):
+                import importlib
+                import pg_helpers.config
+                importlib.reload(pg_helpers.config)
+                
+                self.assertEqual(os.getenv('DB_USER'), 'both_user')
+                self.assertEqual(os.getenv('DB_PASSWORD'), 'both_pass')
+    
+    def test_load_env_with_fallback_nonexistent_file(self):
+        """Test load_env_with_fallback with nonexistent file (should not crash)"""
+        with patch.dict(os.environ, {
+            'CREDENTIALS_DIR': '/nonexistent/path',
+            'CREDENTIALS_FILE': '.env.missing'
+        }, clear=True):
+            # This should not raise an exception, dotenv handles missing files gracefully
+            import importlib
+            import pg_helpers.config
+            importlib.reload(pg_helpers.config)
+            
+            # No assertion needed, just verify it doesn't crash
+    
+    def test_load_env_with_fallback_path_construction(self):
+        """Test that paths are constructed correctly"""
+        with tempfile.TemporaryDirectory() as tmpdir:
+            # Test with various file names including special cases
+            test_cases = [
+                '.env.database',
+                '.env.production',
+                '.env.pink_elephants',
+                'credentials.env'
+            ]
+            
+            for filename in test_cases:
+                env_file = os.path.join(tmpdir, filename)
+                with open(env_file, 'w') as f:
+                    f.write(f"TEST_VAR={filename}\n")
+                
+                with patch.dict(os.environ, {
+                    'CREDENTIALS_DIR': tmpdir,
+                    'CREDENTIALS_FILE': filename
+                }, clear=True):
+                    import importlib
+                    import pg_helpers.config
+                    importlib.reload(pg_helpers.config)
+                    
+                    self.assertEqual(os.getenv('TEST_VAR'), filename)
 
 class TestDatabase(unittest.TestCase):
     """Test database functions"""

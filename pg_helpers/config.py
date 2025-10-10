@@ -1,10 +1,54 @@
 ### pg_helpers/config.py
 """Configuration and environment handling"""
 import os
+from pathlib import Path
 from dotenv import load_dotenv
 
-# Load environment variables
-load_dotenv()
+def load_env_with_fallback():
+    """
+    Load environment variables with flexible configuration.
+    
+    Behavior:
+    - If CREDENTIALS_DIR and CREDENTIALS_FILE are both set: 
+      load from {CREDENTIALS_DIR}/{CREDENTIALS_FILE}
+    - If only CREDENTIALS_DIR is set: 
+      load from {CREDENTIALS_DIR}/.env
+    - If only CREDENTIALS_FILE is set: 
+      load from ./{CREDENTIALS_FILE}
+    - If neither is set (default): 
+      load from ./.env
+    
+    Environment variables are checked BEFORE importing this module:
+        import os
+        os.environ['CREDENTIALS_DIR'] = r'C:\Documents\Project\Assets'
+        os.environ['CREDENTIALS_FILE'] = '.env.pink_elephants'
+        from pg_helpers import createPostgresqlEngine
+    """
+    credentials_dir = os.getenv('CREDENTIALS_DIR')
+    credentials_file = os.getenv('CREDENTIALS_FILE')
+    
+    # Determine which path to use
+    if credentials_dir and credentials_file:
+        # Both specified: use full custom path
+        env_path = Path(credentials_dir) / credentials_file
+    elif credentials_dir:
+        # Only directory specified: use default .env filename
+        env_path = Path(credentials_dir) / '.env'
+    elif credentials_file:
+        # Only filename specified: use current directory
+        env_path = Path(credentials_file)
+    else:
+        # Default: .env in current directory
+        env_path = Path('.env')
+    
+    # Load the environment file
+    load_dotenv(env_path)
+    
+    # Optional: Uncomment to see where env vars were loaded from
+    # print(f"Loading environment from: {env_path}")
+
+# Load environment variables when module is imported
+load_env_with_fallback()
 
 def get_db_config():
     """Get database configuration from environment variables"""
@@ -29,7 +73,6 @@ def validate_db_config():
     if missing:
         raise ValueError(f"Missing required environment variables: {missing}")
     
-    # Validate SSL certificate path if provided
     if config['ssl_ca_cert'] and not os.path.exists(config['ssl_ca_cert']):
         raise ValueError(f"SSL CA certificate file not found: {config['ssl_ca_cert']}")
     
@@ -46,18 +89,14 @@ def get_ssl_params():
     config = get_db_config()
     ssl_params = []
     
-    # Always include SSL mode
     ssl_params.append(f"sslmode={config['ssl_mode']}")
     
-    # Add CA certificate if provided
     if config['ssl_ca_cert']:
         ssl_params.append(f"sslrootcert={config['ssl_ca_cert']}")
     
-    # Add client certificate if provided
     if config['ssl_cert']:
         ssl_params.append(f"sslcert={config['ssl_cert']}")
     
-    # Add client key if provided
     if config['ssl_key']:
         ssl_params.append(f"sslkey={config['ssl_key']}")
     
