@@ -1,19 +1,18 @@
 ### pg_helpers/database.py
 """Database connection and query execution utilities"""
+from __future__ import annotations
 import logging
-import math
 import os
 import pandas as pd
 import pickle
 import time
 from sqlalchemy import create_engine, text
-from sqlalchemy.exc import SQLAlchemyError
-import warnings
+from sqlalchemy.engine import Engine
 
 from .config import validate_db_config, get_ssl_params
 from .notifications import play_notification_sound
 
-def createPostgresqlEngine():
+def createPostgresqlEngine() -> Engine:
     """
     Create SQLAlchemy engine for PostgreSQL connection with SSL support
     
@@ -37,15 +36,17 @@ def createPostgresqlEngine():
         # Optional: Log connection details (without password)
         safe_connection_string = connection_string.replace(config['password'], '****')
         print(f"Connecting to PostgreSQL with SSL: {safe_connection_string}")
-        
-        engine = create_engine(connection_string)
+
+        # pool_pre_ping recycles dead pooled connections automatically, which matters
+        # for the long/overnight batch runs recursiveDataGrabber is built for.
+        engine = create_engine(connection_string, pool_pre_ping=True)
         return engine
         
     except Exception as e:
         print(f"Error creating PostgreSQL engine: {e}")
         raise
 
-def createPostgresqlEngineWithCustomSSL(ssl_ca_cert=None, ssl_mode='require', ssl_cert=None, ssl_key=None):
+def createPostgresqlEngineWithCustomSSL(ssl_ca_cert: str | None = None, ssl_mode: str = 'require', ssl_cert: str | None = None, ssl_key: str | None = None) -> Engine:
     """
     Create SQLAlchemy engine with custom SSL configuration (programmatic override)
     
@@ -87,15 +88,17 @@ def createPostgresqlEngineWithCustomSSL(ssl_ca_cert=None, ssl_mode='require', ss
         # Log connection details (without password)
         safe_connection_string = connection_string.replace(config['password'], '****')
         print(f"Connecting to PostgreSQL with custom SSL: {safe_connection_string}")
-        
-        engine = create_engine(connection_string)
+
+        # pool_pre_ping recycles dead pooled connections automatically, which matters
+        # for the long/overnight batch runs recursiveDataGrabber is built for.
+        engine = create_engine(connection_string, pool_pre_ping=True)
         return engine
         
     except Exception as e:
         print(f"Error creating PostgreSQL engine with custom SSL: {e}")
         raise
 
-def check_ssl_connection(engine=None):
+def check_ssl_connection(engine: Engine | None = None) -> dict:
     """
     Verify SSL connection and display SSL information
     
@@ -186,7 +189,7 @@ def check_ssl_connection(engine=None):
         raise
 
 # Rest of your existing functions remain the same...
-def dataGrabber(query, engine, limit='None', debug=False):
+def dataGrabber(query: str, engine: Engine, limit: str = 'None', debug: bool = False) -> pd.DataFrame:
     """
     Execute query using SQLAlchemy engine and return pandas DataFrame with robust error handling.
     
@@ -292,7 +295,7 @@ def dataGrabber(query, engine, limit='None', debug=False):
     
     return data
 
-def recursiveDataGrabber(query_dict, results_dict, n=1, max_attempts=50):
+def recursiveDataGrabber(query_dict: dict[str, str], results_dict: dict[str, pd.DataFrame | None], n: int = 1, max_attempts: int = 50) -> dict[str, pd.DataFrame | None]:
     """
     Recursively execute queries with exponential backoff retry logic
     
@@ -322,7 +325,7 @@ def recursiveDataGrabber(query_dict, results_dict, n=1, max_attempts=50):
             engine = createPostgresqlEngine()
             
             # Test the connection
-            with engine.connect() as conn:
+            with engine.connect():
                 print("PostgreSQL database connection successful!")
             
             for k, v in query_dict.items():
@@ -374,56 +377,42 @@ def recursiveDataGrabber(query_dict, results_dict, n=1, max_attempts=50):
             print(f"Failed queries: {', '.join(failed_queries)}")
         return results_dict
 
-def _execute_with_manual_construction(query, engine, logger):
+def _execute_with_manual_construction(query: str, engine: Engine, logger: logging.Logger) -> pd.DataFrame:
     """
     Fallback method: Execute query manually and construct DataFrame.
-    
+
     This method bypasses pandas.read_sql() entirely and manually constructs
     the DataFrame from SQLAlchemy results.
     """
     logger.debug("Starting manual DataFrame construction")
-    
+
     with engine.connect() as conn:
         # Execute query and fetch results
         result = conn.execute(text(query))
-        
+
         # Get column names - handle different SQLAlchemy versions
         try:
             columns = list(result.keys())
         except AttributeError:
             # Older SQLAlchemy versions
             columns = list(result._metadata.keys)
-        
+
         logger.debug(f"Columns detected: {columns}")
-        
+
         # Fetch all rows
         rows = result.fetchall()
         logger.debug(f"Fetched {len(rows)} rows")
-        
-        # Convert to list of dictionaries for DataFrame construction
-        data_dicts = []
-        for row in rows:
-            # Handle different row types
-            if hasattr(row, '_asdict'):
-                # Named tuple style
-                row_dict = row._asdict()
-            elif hasattr(row, 'keys'):
-                # Mapping style
-                row_dict = dict(row)
-            else:
-                # Fallback: create dict manually
-                row_dict = {col: val for col, val in zip(columns, row)}
-            
-            data_dicts.append(row_dict)
-        
-        # Create DataFrame
-        df = pd.DataFrame(data_dicts)
+
+        # Build the frame directly from the row sequences + column names. This avoids
+        # allocating an intermediate dict per row, which is meaningfully lower memory
+        # and faster on large result sets than the previous list-of-dicts approach.
+        df = pd.DataFrame(rows, columns=columns)
         logger.debug(f"Created DataFrame with shape: {df.shape}")
-        
+
         return df
 
 
-def _execute_with_alternative_params(query, engine, logger):
+def _execute_with_alternative_params(query: str, engine: Engine, logger: logging.Logger) -> pd.DataFrame:
     """
     Fallback method: Try pandas.read_sql() with different parameters.
     
@@ -454,7 +443,7 @@ def _execute_with_alternative_params(query, engine, logger):
     raise Exception("All alternative parameter combinations failed")
 
 
-def _print_comprehensive_error_report(query, engine, errors, logger):
+def _print_comprehensive_error_report(query: str, engine: Engine, errors: list[Exception], logger: logging.Logger) -> None:
     """
     Print a comprehensive error report for debugging purposes.
     """
@@ -480,7 +469,7 @@ def _print_comprehensive_error_report(query, engine, errors, logger):
     logger.error("=" * 60)
 
 
-def diagnose_connection_and_query(engine, query, limit=10):
+def diagnose_connection_and_query(engine: Engine, query: str, limit: int = 10) -> dict:
     """
     Diagnostic function to help troubleshoot SQLAlchemy/pandas issues.
     

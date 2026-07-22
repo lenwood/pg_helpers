@@ -11,6 +11,10 @@ env/
 venv/
 .venv/
 .env
+!.env.example
 *.so
 .coverage
 .pytest_cache/
+
+# AI
+CLAUDE.md

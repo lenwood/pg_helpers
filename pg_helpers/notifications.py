@@ -1,9 +1,10 @@
 ### pg_helpers/notifications.py
 """Notification utilities"""
+from __future__ import annotations
 import os
 import sys
 
-def play_notification_sound():
+def play_notification_sound() -> None:
     """
     Play notification sound based on operating system
     """
