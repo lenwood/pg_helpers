@@ -1,5 +1,9 @@
 # PostgreSQL Helper Functions
 
+[![PyPI version](https://img.shields.io/pypi/v/pg-helpers.svg)](https://pypi.org/project/pg-helpers/)
+[![Python versions](https://img.shields.io/pypi/pyversions/pg-helpers.svg)](https://pypi.org/project/pg-helpers/)
+[![License: MIT](https://img.shields.io/pypi/l/pg-helpers.svg)](https://github.com/lenwood/pg_helpers/blob/main/LICENSE)
+
 A Python package providing robust utilities for PostgreSQL database operations, query management, and data analysis workflows with enterprise-grade security.
 
 ## Features
