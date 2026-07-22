@@ -347,33 +347,6 @@ tests/test_database.py::TestNotifications::test_play_notification_sound_windows 
 ================================================= 40 passed in 1.03s ==================================================
 ```
 
-### Flexible Credential File Configuration **NEW in v1.3.2**
-
-- **Custom credential locations**: Use `CREDENTIALS_DIR` and `CREDENTIALS_FILE` environment variables
-- **Perfect for shared credentials**: Point multiple projects to a centralized credential directory
-- **Environment-specific files**: Use different credential files for dev/staging/production
-- **Fully backwards compatible**: Existing projects continue to work without any changes
-
-```python
-import os
-
-# Use centralized credentials directory
-os.environ['CREDENTIALS_DIR'] = r'C:\Documents\Credentials'
-from pg_helpers import createPostgresqlEngine
-engine = createPostgresqlEngine()  # Loads C:\Documents\Credentials\.env
-
-# Use custom filename for database credentials
-os.environ['CREDENTIALS_FILE'] = '.env.database'
-from pg_helpers import createPostgresqlEngine
-engine = createPostgresqlEngine()  # Loads ./.env.database
-
-# Combine both for full flexibility
-os.environ['CREDENTIALS_DIR'] = r'C:\Documents\Project\Assets'
-os.environ['CREDENTIALS_FILE'] = '.env.production'
-from pg_helpers import createPostgresqlEngine
-engine = createPostgresqlEngine()  # Loads C:\Documents\Project\Assets\.env.production
-```
-
 ### Continuous Integration Setup **NEW in v1.3.0**
 
 For automated testing across multiple environments, add this GitHub Actions workflow:
@@ -620,6 +593,7 @@ def setup_credentials():
 
 # Call this before importing pg_helpers
 setup_credentials()
+```
 
 ## Security Best Practices
 
