@@ -4,7 +4,9 @@
 [![Python versions](https://img.shields.io/pypi/pyversions/pg-helpers.svg)](https://pypi.org/project/pg-helpers/)
 [![License: MIT](https://img.shields.io/pypi/l/pg-helpers.svg)](https://github.com/lenwood/pg_helpers/blob/main/LICENSE)
 
-A Python package providing robust utilities for PostgreSQL database operations, query management, and data analysis workflows with enterprise-grade security.
+Stop context-switching between your SQL and your DataFrame. Write the query once, then pull iterative datasets — different date ranges, ID lists, filters — without the query ever being back in front of you.
+
+Under the hood it handles the parts that make that loop reliable: automatic retry with exponential backoff for flaky connections, SSL/TLS with CA verification for cloud databases, and cross-platform notifications when long queries finish.
 
 ## Features
 
