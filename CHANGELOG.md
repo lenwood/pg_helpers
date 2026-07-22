@@ -1,6 +1,9 @@
 # Changelog
 
-### Version 1.3.4 — 2026-07-22 (Current)
+### Version 1.3.5 — 2026-07-22 (Current)
+- **Documentation cleanup**: moved the changelog out of `README.md` into this file (with release dates), removed a duplicated credential-configuration block, fixed an unclosed code fence, added PyPI/Python-version/license badges, and rewrote the README's opening pitch to lead with the write-once-iterate-on-data workflow
+
+### Version 1.3.4 — 2026-07-22
 - **Package surface fixed**: `check_ssl_connection`, `createPostgresqlEngineWithCustomSSL`, and `diagnose_connection_and_query` are now exported from the package top level, and `__version__` reflects the real release
 - **Safer `listPrep`**: passing an empty list now raises a clear `ValueError` instead of an opaque `IndexError`
 - **Connection reliability**: engines are created with `pool_pre_ping=True` so dead pooled connections are recycled automatically during long/overnight runs

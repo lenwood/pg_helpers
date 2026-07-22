@@ -18,7 +18,7 @@ from .query_utils import (
 )
 from .notifications import play_notification_sound
 
-__version__ = "1.3.4"
+__version__ = "1.3.5"
 __author__ = "Chris Leonard"
 
 # Make main functions available at package level

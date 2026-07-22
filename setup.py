@@ -6,7 +6,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setup(
     name="pg-helpers",
-    version="1.3.4",
+    version="1.3.5",
     author="Chris Leonard",
     author_email="lenwood@duck.com",
     description="PostgreSQL helper functions for data analysis with enterprise-grade security",

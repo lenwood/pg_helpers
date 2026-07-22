@@ -726,4 +726,4 @@ Chris Leonard
 
 ---
 
-*This package was designed for data analysts and engineers who work with PostgreSQL databases and need reliable, automated query execution with enterprise-grade security. Version 1.3.2 adds flexible credential management while ensuring this reliability through comprehensive testing across multiple platforms and Python versions.*
+*This package was designed for data analysts and engineers who work with PostgreSQL databases and need reliable, automated query execution — with flexible credential management, SSL security, and comprehensive testing across multiple platforms and Python versions.*
