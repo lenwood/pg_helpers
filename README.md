@@ -1,6 +1,12 @@
 # PostgreSQL Helper Functions
 
-A Python package providing robust utilities for PostgreSQL database operations, query management, and data analysis workflows with enterprise-grade security.
+[![PyPI version](https://img.shields.io/pypi/v/pg-helpers.svg)](https://pypi.org/project/pg-helpers/)
+[![Python versions](https://img.shields.io/pypi/pyversions/pg-helpers.svg)](https://pypi.org/project/pg-helpers/)
+[![License: MIT](https://img.shields.io/pypi/l/pg-helpers.svg)](https://github.com/lenwood/pg_helpers/blob/main/LICENSE)
+
+Stop context-switching between your SQL and your DataFrame. Write the query once, then pull iterative datasets — different date ranges, ID lists, filters — without the query ever being back in front of you.
+
+Under the hood it handles the parts that make that loop reliable: automatic retry with exponential backoff for flaky connections, SSL/TLS with CA verification for cloud databases, and cross-platform notifications when long queries finish.
 
 ## Features
 
@@ -11,50 +17,7 @@ A Python package providing robust utilities for PostgreSQL database operations, 
 - **Environment-based configuration** for secure credential management
 - **Comprehensive error handling** and logging
 - **SSL/TLS encryption** with CA certificate verification for AWS RDS and other cloud databases
-- **Updated in v1.3.3**
-  - **Recommended install via PyPi**: Use 'pip install pg_helpers' to install
-- **Enhanced in v1.3.2**
-  - **Flexible credential file location**: Support for `CREDENTIALS_DIR` and `CREDENTIALS_FILE` environment variables
-  - **Enhanced configuration**: Specify custom .env file paths for different projects and environments
-  - **Centralized credentials**: Share credential directories across multiple projects
-- **Enhanced in v1.3.1:**
-  - **Comprehensive test suite** with 40+ test cases covering all functionality
-  - **Cross-platform validation** ensuring reliability on Windows, macOS, and Linux
-  - **Function name improvements** for better API clarity
-- **Previous in v1.2.0:**
-  - **Full SSL support** with optional CA certificate verification
-  - **Man-in-the-middle attack prevention** for production environments
-  - **SSL connection testing** and diagnostics
-- **Previous in v1.1.0:**
-  - **Advanced fallback methods** for SQLAlchemy/pandas compatibility issues
-  - **Enhanced debugging** and diagnostic capabilities
-
-## What's New in Version 1.3.2
-
-### Flexible Credential File Configuration
-- **Custom credential locations**: Use `CREDENTIALS_DIR` and `CREDENTIALS_FILE` environment variables
-- **Perfect for shared credentials**: Point multiple projects to a centralized credential directory
-- **Environment-specific files**: Use different credential files for dev/staging/production
-- **Fully backwards compatible**: Existing projects continue to work without any changes
-```python
-import os
-
-# Use centralized credentials directory
-os.environ['CREDENTIALS_DIR'] = r'C:\Documents\Credentials'
-from pg_helpers import createPostgresqlEngine
-engine = createPostgresqlEngine()  # Loads C:\Documents\Credentials\.env
-
-# Use custom filename for database credentials
-os.environ['CREDENTIALS_FILE'] = '.env.database'
-from pg_helpers import createPostgresqlEngine
-engine = createPostgresqlEngine()  # Loads ./.env.database
-
-# Combine both for full flexibility
-os.environ['CREDENTIALS_DIR'] = r'C:\Documents\Project\Assets'
-os.environ['CREDENTIALS_FILE'] = '.env.production'
-from pg_helpers import createPostgresqlEngine
-engine = createPostgresqlEngine()  # Loads C:\Documents\Project\Assets\.env.production
-```
+- **Flexible credential file location** via `CREDENTIALS_DIR` and `CREDENTIALS_FILE` environment variables
 
 ## Installation
 
@@ -390,33 +353,6 @@ tests/test_database.py::TestNotifications::test_play_notification_sound_windows 
 ================================================= 40 passed in 1.03s ==================================================
 ```
 
-### Flexible Credential File Configuration **NEW in v1.3.2**
-
-- **Custom credential locations**: Use `CREDENTIALS_DIR` and `CREDENTIALS_FILE` environment variables
-- **Perfect for shared credentials**: Point multiple projects to a centralized credential directory
-- **Environment-specific files**: Use different credential files for dev/staging/production
-- **Fully backwards compatible**: Existing projects continue to work without any changes
-
-```python
-import os
-
-# Use centralized credentials directory
-os.environ['CREDENTIALS_DIR'] = r'C:\Documents\Credentials'
-from pg_helpers import createPostgresqlEngine
-engine = createPostgresqlEngine()  # Loads C:\Documents\Credentials\.env
-
-# Use custom filename for database credentials
-os.environ['CREDENTIALS_FILE'] = '.env.database'
-from pg_helpers import createPostgresqlEngine
-engine = createPostgresqlEngine()  # Loads ./.env.database
-
-# Combine both for full flexibility
-os.environ['CREDENTIALS_DIR'] = r'C:\Documents\Project\Assets'
-os.environ['CREDENTIALS_FILE'] = '.env.production'
-from pg_helpers import createPostgresqlEngine
-engine = createPostgresqlEngine()  # Loads C:\Documents\Project\Assets\.env.production
-```
-
 ### Continuous Integration Setup **NEW in v1.3.0**
 
 For automated testing across multiple environments, add this GitHub Actions workflow:
@@ -663,6 +599,7 @@ def setup_credentials():
 
 # Call this before importing pg_helpers
 setup_credentials()
+```
 
 ## Security Best Practices
 
@@ -759,53 +696,7 @@ your_project/
 
 ## Changelog
 
-### Version 1.3.4 (Current)
-- **Package surface fixed**: `check_ssl_connection`, `createPostgresqlEngineWithCustomSSL`, and `diagnose_connection_and_query` are now exported from the package top level, and `__version__` reflects the real release
-- **Safer `listPrep`**: passing an empty list now raises a clear `ValueError` instead of an opaque `IndexError`
-- **Connection reliability**: engines are created with `pool_pre_ping=True` so dead pooled connections are recycled automatically during long/overnight runs
-- **Performance**: the manual-construction query fallback builds the DataFrame directly from rows instead of an intermediate list of dicts
-- **Type hints**: all public and private functions now have type hints
-- **New `.env.example`**: template for required and optional environment variables
-- **Documentation**: emojis removed from the documentation prose
-
-### Version 1.3.3
-- **Updated installation instructions**: Recommend using 'pip install pg_helpers'
-
-### Version 1.3.2
-- **Flexible credential file location**: Support for `CREDENTIALS_DIR` and `CREDENTIALS_FILE` environment variables
-- **Enhanced configuration**: Specify custom .env file paths for different projects and environments
-- **Centralized credentials**: Share credential directories across multiple projects
-- **Environment-specific files**: Easy support for .env.production, .env.staging, .env.dev
-- **Backwards compatible**: Defaults to `.env` in current directory when no variables set
-- **Documentation**: New credential management strategies and best practices guide
-
-### Version 1.3.1
-- **Comprehensive test suite**: 40+ test cases with >90% code coverage
-- **Cross-platform validation**: Tests confirm functionality on Windows, macOS, and Linux
-- **API improvements**: `test_ssl_connection()` renamed to `check_ssl_connection()` for clarity
-- **CI/CD ready**: GitHub Actions workflow for automated testing across environments
-- **Enhanced documentation**: Detailed testing guide and troubleshooting section
-- **Quality assurance**: All functions tested including error conditions and edge cases
-
-### Version 1.2.0
-- **SSL/TLS support**: Full SSL encryption with optional CA certificate verification
-- **Security enhancements**: Man-in-the-middle attack prevention for production environments
-- **SSL testing**: New SSL connection diagnostics
-- **Custom SSL configuration**: Programmatic SSL parameter override
-- **Environment SSL config**: Optional SSL settings via environment variables
-- **Backward compatibility**: Existing code continues to work without changes
-
-### Version 1.1.0
-- **Enhanced error handling**: Multiple fallback methods for pandas/SQLAlchemy compatibility
-- **Improved debugging**: Comprehensive logging and diagnostic capabilities
-- **Better reliability**: Automatic detection and handling of metadata interpretation errors
-- **Manual DataFrame construction**: Fallback method for complex data type issues
-- **Alternative parameter testing**: Tries different pandas configurations automatically
-
-### Version 1.0.0
-- Initial release with core functionality
-- Basic retry logic and PostgreSQL integration
-- Query templating and notification system
+See [CHANGELOG.md](CHANGELOG.md) for release history.
 
 ## Contributing
 
@@ -835,4 +726,4 @@ Chris Leonard
 
 ---
 
-*This package was designed for data analysts and engineers who work with PostgreSQL databases and need reliable, automated query execution with enterprise-grade security. Version 1.3.2 adds flexible credential management while ensuring this reliability through comprehensive testing across multiple platforms and Python versions.*
+*This package was designed for data analysts and engineers who work with PostgreSQL databases and need reliable, automated query execution — with flexible credential management, SSL security, and comprehensive testing across multiple platforms and Python versions.*
