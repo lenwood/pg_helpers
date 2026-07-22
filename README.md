@@ -4,32 +4,32 @@ A Python package providing robust utilities for PostgreSQL database operations, 
 
 ## Features
 
-- 🔄 **Automatic retry logic** with exponential backoff for unreliable connections
-- 📊 **Seamless pandas integration** for data analysis
-- 🔧 **SQL query templating** and parameter substitution
-- 🔊 **Cross-platform notifications** when long queries complete
-- ⚙️ **Environment-based configuration** for secure credential management
-- 🛡️ **Comprehensive error handling** and logging
-- 🔒 **SSL/TLS encryption** with CA certificate verification for AWS RDS and other cloud databases
+- **Automatic retry logic** with exponential backoff for unreliable connections
+- **Seamless pandas integration** for data analysis
+- **SQL query templating** and parameter substitution
+- **Cross-platform notifications** when long queries complete
+- **Environment-based configuration** for secure credential management
+- **Comprehensive error handling** and logging
+- **SSL/TLS encryption** with CA certificate verification for AWS RDS and other cloud databases
 - **Updated in v1.3.3**
-  - ✅ **Recommended install via PyPi**: Use 'pip install pg_helpers' to install
+  - **Recommended install via PyPi**: Use 'pip install pg_helpers' to install
 - **Enhanced in v1.3.2**
-  - 📁 **Flexible credential file location**: Support for `CREDENTIALS_DIR` and `CREDENTIALS_FILE` environment variables
-  - 🔄 **Enhanced configuration**: Specify custom .env file paths for different projects and environments
-  - 🏢 **Centralized credentials**: Share credential directories across multiple projects
+  - **Flexible credential file location**: Support for `CREDENTIALS_DIR` and `CREDENTIALS_FILE` environment variables
+  - **Enhanced configuration**: Specify custom .env file paths for different projects and environments
+  - **Centralized credentials**: Share credential directories across multiple projects
 - **Enhanced in v1.3.1:**
-  - 🧪 **Comprehensive test suite** with 40+ test cases covering all functionality
-  - ✅ **Cross-platform validation** ensuring reliability on Windows, macOS, and Linux
-  - 🔍 **Function name improvements** for better API clarity
+  - **Comprehensive test suite** with 40+ test cases covering all functionality
+  - **Cross-platform validation** ensuring reliability on Windows, macOS, and Linux
+  - **Function name improvements** for better API clarity
 - **Previous in v1.2.0:**
-  - 🔐 **Full SSL support** with optional CA certificate verification
-  - 🛡️ **Man-in-the-middle attack prevention** for production environments
-  - ✅ **SSL connection testing** and diagnostics
+  - **Full SSL support** with optional CA certificate verification
+  - **Man-in-the-middle attack prevention** for production environments
+  - **SSL connection testing** and diagnostics
 - **Previous in v1.1.0:**
-  - 🚀 **Advanced fallback methods** for SQLAlchemy/pandas compatibility issues
-  - 🔍 **Enhanced debugging** and diagnostic capabilities
+  - **Advanced fallback methods** for SQLAlchemy/pandas compatibility issues
+  - **Enhanced debugging** and diagnostic capabilities
 
-## What's New in Version 1.3.2 🧪
+## What's New in Version 1.3.2
 
 ### Flexible Credential File Configuration
 - **Custom credential locations**: Use `CREDENTIALS_DIR` and `CREDENTIALS_FILE` environment variables
@@ -72,7 +72,7 @@ pip install -e .
 
 ### From GitHub (Specific Version)
 ```bash
-pip install git+https://github.com/lenwood/pg_helpers.git@v1.3.3
+pip install git+https://github.com/lenwood/pg_helpers.git@v1.3.4
 ```
 
 ### Dependencies
@@ -145,17 +145,17 @@ engine = createPostgresqlEngine()
 ```
 
 **Configuration Priority:**
-- Both `CREDENTIALS_DIR` and `CREDENTIALS_FILE` set → `{CREDENTIALS_DIR}/{CREDENTIALS_FILE}`
-- Only `CREDENTIALS_DIR` set → `{CREDENTIALS_DIR}/.env`
-- Only `CREDENTIALS_FILE` set → `./{CREDENTIALS_FILE}`
-- Neither set (default) → `./.env`
+- Both `CREDENTIALS_DIR` and `CREDENTIALS_FILE` set `{CREDENTIALS_DIR}/{CREDENTIALS_FILE}`
+- Only `CREDENTIALS_DIR` set `{CREDENTIALS_DIR}/.env`
+- Only `CREDENTIALS_FILE` set `./{CREDENTIALS_FILE}`
+- Neither set (default) `./.env`
 
 **Benefits of flexible credentials:**
-- 🔐 **Centralized security**: Keep all credentials in one secure location
-- 🏢 **Team workflows**: Share credential directories across team members
-- 🌍 **Environment-specific**: Use `.env.production`, `.env.staging`, `.env.dev`
-- 🔄 **Multi-project**: Reuse credentials across multiple analysis projects
-- ✅ **Backwards compatible**: Existing code works without changes
+- **Centralized security**: Keep all credentials in one secure location
+- **Team workflows**: Share credential directories across team members
+- **Environment-specific**: Use `.env.production`, `.env.staging`, `.env.dev`
+- **Multi-project**: Reuse credentials across multiple analysis projects
+- **Backwards compatible**: Existing code works without changes
 
 ### 2. Basic Usage
 
@@ -347,30 +347,30 @@ python -m pytest tests/test_database.py::TestNotifications -v  # Cross-platform 
 ### What the Tests Validate
 
 #### **Core Functionality Tests**
-- ✅ **Database engine creation** with various SSL configurations
-- ✅ **Query execution** with multiple fallback methods
-- ✅ **SSL connection testing** and diagnostics
-- ✅ **Configuration validation** and environment variable handling
-- ✅ **Query template processing** with parameter substitution
-- ✅ **Error handling** for network issues and compatibility problems
+- **Database engine creation** with various SSL configurations
+- **Query execution** with multiple fallback methods
+- **SSL connection testing** and diagnostics
+- **Configuration validation** and environment variable handling
+- **Query template processing** with parameter substitution
+- **Error handling** for network issues and compatibility problems
 
 #### **Cross-Platform Compatibility**
-- ✅ **File operations** on Windows, macOS, and Linux
-- ✅ **Sound notifications** across different operating systems
-- ✅ **Environment variable handling** with different shell environments
-- ✅ **Temporary file management** and cleanup
+- **File operations** on Windows, macOS, and Linux
+- **Sound notifications** across different operating systems
+- **Environment variable handling** with different shell environments
+- **Temporary file management** and cleanup
 
 #### **Error Condition Testing**
-- ✅ **Missing environment variables** and configuration errors
-- ✅ **SSL certificate validation** failures and missing files
-- ✅ **Database connection failures** and retry logic
-- ✅ **Pandas/SQLAlchemy compatibility** issues and fallback methods
-- ✅ **Invalid query parameters** and malformed SQL
+- **Missing environment variables** and configuration errors
+- **SSL certificate validation** failures and missing files
+- **Database connection failures** and retry logic
+- **Pandas/SQLAlchemy compatibility** issues and fallback methods
+- **Invalid query parameters** and malformed SQL
 
 #### **Integration Testing**
-- ✅ **End-to-end workflows** combining multiple functions
-- ✅ **Configuration to engine creation** pipelines
-- ✅ **Query templating to execution** workflows
+- **End-to-end workflows** combining multiple functions
+- **Configuration to engine creation** pipelines
+- **Query templating to execution** workflows
 
 ### Test Output Example
 
@@ -628,15 +628,15 @@ engine = createPostgresqlEngine()
 ### Best Practices for Credential Files
 
 **Security:**
-- ✅ Store credential directories outside of project repositories
-- ✅ Use restrictive file permissions (e.g., `chmod 600` on Linux/macOS)
-- ✅ Never commit credential file paths to version control
-- ✅ Document credential file locations in team wikis, not in code
+- Store credential directories outside of project repositories
+- Use restrictive file permissions (e.g., `chmod 600` on Linux/macOS)
+- Never commit credential file paths to version control
+- Document credential file locations in team wikis, not in code
 
 **Organization:**
-- 📁 Use descriptive filenames: `.env.database`, `.env.api`, `.env.aws`
-- 📁 Group by environment: `.env.production`, `.env.staging`
-- 📁 Keep a `.env.template` in your repository with dummy values
+- Use descriptive filenames: `.env.database`, `.env.api`, `.env.aws`
+- Group by environment: `.env.production`, `.env.staging`
+- Keep a `.env.template` in your repository with dummy values
 
 **Team Workflows:**
 ```python
@@ -759,39 +759,48 @@ your_project/
 
 ## Changelog
 
-### Version 1.3.3 (Current) 📁
-- ✅ **Updated installation instructions**: Recommend using 'pip install pg_helpers'
+### Version 1.3.4 (Current)
+- **Package surface fixed**: `check_ssl_connection`, `createPostgresqlEngineWithCustomSSL`, and `diagnose_connection_and_query` are now exported from the package top level, and `__version__` reflects the real release
+- **Safer `listPrep`**: passing an empty list now raises a clear `ValueError` instead of an opaque `IndexError`
+- **Connection reliability**: engines are created with `pool_pre_ping=True` so dead pooled connections are recycled automatically during long/overnight runs
+- **Performance**: the manual-construction query fallback builds the DataFrame directly from rows instead of an intermediate list of dicts
+- **Type hints**: all public and private functions now have type hints
+- **New `.env.example`**: template for required and optional environment variables
+- **Documentation**: emojis removed from the documentation prose
+
+### Version 1.3.3
+- **Updated installation instructions**: Recommend using 'pip install pg_helpers'
 
 ### Version 1.3.2
-- 📁 **Flexible credential file location**: Support for `CREDENTIALS_DIR` and `CREDENTIALS_FILE` environment variables
-- 🔄 **Enhanced configuration**: Specify custom .env file paths for different projects and environments
-- 🏢 **Centralized credentials**: Share credential directories across multiple projects
-- 🌍 **Environment-specific files**: Easy support for .env.production, .env.staging, .env.dev
-- ✅ **Backwards compatible**: Defaults to `.env` in current directory when no variables set
-- 📖 **Documentation**: New credential management strategies and best practices guide
+- **Flexible credential file location**: Support for `CREDENTIALS_DIR` and `CREDENTIALS_FILE` environment variables
+- **Enhanced configuration**: Specify custom .env file paths for different projects and environments
+- **Centralized credentials**: Share credential directories across multiple projects
+- **Environment-specific files**: Easy support for .env.production, .env.staging, .env.dev
+- **Backwards compatible**: Defaults to `.env` in current directory when no variables set
+- **Documentation**: New credential management strategies and best practices guide
 
 ### Version 1.3.1
-- 🧪 **Comprehensive test suite**: 40+ test cases with >90% code coverage
-- ✅ **Cross-platform validation**: Tests confirm functionality on Windows, macOS, and Linux
-- 🔧 **API improvements**: `test_ssl_connection()` renamed to `check_ssl_connection()` for clarity
-- 🚀 **CI/CD ready**: GitHub Actions workflow for automated testing across environments
-- 📋 **Enhanced documentation**: Detailed testing guide and troubleshooting section
-- 🛡️ **Quality assurance**: All functions tested including error conditions and edge cases
+- **Comprehensive test suite**: 40+ test cases with >90% code coverage
+- **Cross-platform validation**: Tests confirm functionality on Windows, macOS, and Linux
+- **API improvements**: `test_ssl_connection()` renamed to `check_ssl_connection()` for clarity
+- **CI/CD ready**: GitHub Actions workflow for automated testing across environments
+- **Enhanced documentation**: Detailed testing guide and troubleshooting section
+- **Quality assurance**: All functions tested including error conditions and edge cases
 
 ### Version 1.2.0
-- 🔒 **SSL/TLS support**: Full SSL encryption with optional CA certificate verification
-- 🛡️ **Security enhancements**: Man-in-the-middle attack prevention for production environments  
-- ✅ **SSL testing**: New SSL connection diagnostics
-- 🔧 **Custom SSL configuration**: Programmatic SSL parameter override
-- 📋 **Environment SSL config**: Optional SSL settings via environment variables
-- 🔄 **Backward compatibility**: Existing code continues to work without changes
+- **SSL/TLS support**: Full SSL encryption with optional CA certificate verification
+- **Security enhancements**: Man-in-the-middle attack prevention for production environments
+- **SSL testing**: New SSL connection diagnostics
+- **Custom SSL configuration**: Programmatic SSL parameter override
+- **Environment SSL config**: Optional SSL settings via environment variables
+- **Backward compatibility**: Existing code continues to work without changes
 
 ### Version 1.1.0
-- ✨ **Enhanced error handling**: Multiple fallback methods for pandas/SQLAlchemy compatibility
-- 🔍 **Improved debugging**: Comprehensive logging and diagnostic capabilities
-- 🛠️ **Better reliability**: Automatic detection and handling of metadata interpretation errors
-- 📊 **Manual DataFrame construction**: Fallback method for complex data type issues
-- 🔧 **Alternative parameter testing**: Tries different pandas configurations automatically
+- **Enhanced error handling**: Multiple fallback methods for pandas/SQLAlchemy compatibility
+- **Improved debugging**: Comprehensive logging and diagnostic capabilities
+- **Better reliability**: Automatic detection and handling of metadata interpretation errors
+- **Manual DataFrame construction**: Fallback method for complex data type issues
+- **Alternative parameter testing**: Tries different pandas configurations automatically
 
 ### Version 1.0.0
 - Initial release with core functionality

@@ -1,11 +1,12 @@
 ### pg_helpers/config.py
 """Configuration and environment handling"""
+from __future__ import annotations
 import os
 from pathlib import Path
 from dotenv import load_dotenv
 
-def load_env_with_fallback():
-    """
+def load_env_with_fallback() -> None:
+    r"""
     Load environment variables with flexible configuration.
     
     Behavior:
@@ -50,7 +51,7 @@ def load_env_with_fallback():
 # Load environment variables when module is imported
 load_env_with_fallback()
 
-def get_db_config():
+def get_db_config() -> dict:
     """Get database configuration from environment variables"""
     return {
         'user': os.getenv('DB_USER'),
@@ -64,7 +65,7 @@ def get_db_config():
         'ssl_key': os.getenv('DB_SSL_KEY')           # Optional client key
     }
 
-def validate_db_config():
+def validate_db_config() -> dict:
     """Validate that required environment variables are set"""
     config = get_db_config()
     required_keys = ['user', 'password', 'host', 'database']
@@ -84,7 +85,7 @@ def validate_db_config():
     
     return config
 
-def get_ssl_params():
+def get_ssl_params() -> str:
     """Get SSL parameters for connection string"""
     config = get_db_config()
     ssl_params = []

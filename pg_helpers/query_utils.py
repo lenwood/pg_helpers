@@ -1,16 +1,21 @@
 ### pg_helpers/query_utils.py
 """Query preparation and cleaning utilities"""
+from __future__ import annotations
 
-def listPrep(iList):
+def listPrep(iList: list | int | float | str) -> str:
     """
     Prepare a list for use in SQL queries by converting to comma-separated string
-    
+
     Args:
         iList: List of integers, floats, or strings, or a single value
-        
+
     Returns:
         str: Formatted string for SQL query
     """
+    # Guard the empty-list case before indexing iList[0]: a bare IndexError here
+    # is opaque to callers, so raise a message that names the actual problem.
+    if isinstance(iList, list) and len(iList) == 0:
+        raise ValueError("listPrep received an empty list")
     if type(iList) == list:
         if type(iList[0]) == int:
             iStr = ','.join(str(x) for x in iList)
@@ -24,8 +29,8 @@ def listPrep(iList):
     
     return iStr
 
-def queryCleaner(file, list1='empty', varString1='empty', list2='empty', 
-                varString2='empty', startDate='START1', endDate='END1'):
+def queryCleaner(file: str, list1='empty', varString1: str = 'empty', list2='empty',
+                varString2: str = 'empty', startDate='START1', endDate='END1') -> str:
     """
     Clean and prepare SQL query by replacing placeholders with actual values
     

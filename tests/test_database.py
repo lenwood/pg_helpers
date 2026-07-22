@@ -49,8 +49,9 @@ class TestQueryUtils(unittest.TestCase):
     
     def test_listPrep_empty_list(self):
         """Test listPrep with empty list"""
-        with self.assertRaises(IndexError):
+        with self.assertRaises(ValueError) as context:
             listPrep([])
+        self.assertIn("empty list", str(context.exception))
     
     def test_queryCleaner_basic(self):
         """Test basic query cleaning functionality"""
@@ -353,6 +354,7 @@ class TestDatabase(unittest.TestCase):
         mock_create_engine.assert_called_once()
         call_args = mock_create_engine.call_args[0][0]
         self.assertIn('postgresql://testuser:testpass@localhost:5432/testdb', call_args)
+        self.assertTrue(mock_create_engine.call_args.kwargs.get('pool_pre_ping'))
         self.assertEqual(result, mock_engine)
     
     @patch('pg_helpers.database.validate_db_config')
@@ -389,6 +391,7 @@ class TestDatabase(unittest.TestCase):
         call_args = mock_create_engine.call_args[0][0]
         self.assertIn('sslmode=verify-full', call_args)
         self.assertIn('sslrootcert=/path/to/ca.crt', call_args)
+        self.assertTrue(mock_create_engine.call_args.kwargs.get('pool_pre_ping'))
         self.assertEqual(result, mock_engine)
 
     @patch('os.path.exists')
